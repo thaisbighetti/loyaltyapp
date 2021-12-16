@@ -5,3 +5,4 @@ from .models import Member, RegisterMember
 admin.site.register(Member)
 admin.site.register(RegisterMember)
 
+
