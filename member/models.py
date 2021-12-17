@@ -4,8 +4,8 @@ from localflavor.br.models import BRCPFField, BRPostalCodeField
 from phonenumber_field.modelfields import PhoneNumberField
 
 
-class RegisterMember(models.Model):
-    cpf = BRCPFField(help_text='Formato: 00011122233', primary_key=True, unique=True)
+class Register(models.Model):
+    cpf = BRCPFField(help_text='Formato: 00011122233', primary_key=True)
     password = models.CharField(max_length=50)
 
     def __str__(self):
@@ -13,7 +13,7 @@ class RegisterMember(models.Model):
 
 
 class Member(models.Model):
-    cpf = BRCPFField(help_text='Formato: 00011122233', primary_key=True, unique=True)
+    cpf = BRCPFField(help_text='Formato: 00011122233', primary_key=True)
     nome = models.CharField(max_length=255)
     email = models.EmailField()
     telefone = PhoneNumberField(region='BR', help_text='Formato DDD + Número', verbose_name='Telefone')

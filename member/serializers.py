@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Member, RegisterMember
+from .models import Member, Register
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -15,15 +15,15 @@ class RegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
 
     class Meta:
-        model = RegisterMember
+        model = Register
         fields = ['cpf', 'password', 'password2']
         extra_kwargs = {'password': {'write_only': True}}
 
     def save(self):
-        register = RegisterMember()
+        register = Register()
         cpf = self.validated_data['cpf']
         try:
-            cpf2 = RegisterMember.objects.get(cpf=cpf)
+            cpf2 = Register.objects.get(cpf=cpf)
         except ObjectDoesNotExist:
             register.cpf = cpf
             register.save()
@@ -52,12 +52,12 @@ class PasswordChange(serializers.ModelSerializer):
     new_password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
 
     class Meta:
-        model = RegisterMember
+        model = Register
         fields = ['cpf', 'new_password2', 'new_password']
         extra_kwargs = {'password': {'write_only': True}}
 
     def save(self):
-        cpf = RegisterMember.objects.get(cpf=self.validated_data['cpf'])
+        cpf = Register.objects.get(cpf=self.validated_data['cpf'])
 
         new_password = self.validated_data['new_password']
         new_password2 = self.validated_data['new_password2']

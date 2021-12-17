@@ -21,6 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', RegisterMember.as_view()),
     path('member/<str:cpf>', MemberList.as_view()),
-    path('password/', PasswordChange.as_view()),
+    path('password/<str:cpf>', PasswordChange.as_view()),
 
 ]

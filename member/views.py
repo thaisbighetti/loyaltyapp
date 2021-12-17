@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import generics, status
-from member.models import Member, RegisterMember
+from member.models import Member, Register
 from .serializers import MemberSerializer, RegistrationSerializer, PasswordChange
 
 
@@ -29,12 +29,12 @@ class MemberList(generics.ListAPIView):
     queryset = MemberSerializer
 
     def list(self, request, cpf):
-        member = Member.objects.filter(cpf=cpf)
-        serializer = MemberSerializer(member, many=True)
+        member = get_object_or_404(Member, pk=cpf)
+        serializer = MemberSerializer(member)
         return Response(serializer.data)
 
     def put(self, request, cpf):
-        member = Member.objects.get(cpf=cpf)
+        member = get_object_or_404(Member, pk=cpf)
         serializer = MemberSerializer(member, data=request.data, partial=True)
         if serializer.is_valid():
             with transaction.atomic():
@@ -42,7 +42,9 @@ class MemberList(generics.ListAPIView):
         return Response({'Usuário atualizado:': serializer.data}, status=http.HTTPStatus.OK)
 
     def delete(self, request, cpf):
-        member = Member.objects.get(cpf=cpf)
+        member = get_object_or_404(Member, pk=cpf)
+        register = get_object_or_404(Register, pk=cpf)
+        register.delete()
         member.delete()
         return Response(status=http.HTTPStatus.NO_CONTENT)
 
@@ -51,9 +53,14 @@ class PasswordChange(generics.ListAPIView):
     serializer_class = PasswordChange
     queryset = PasswordChange
 
-    def put(self, request,):
-        member = get_object_or_404(RegisterMember, cpf=request.data['cpf'])
-        serializer = MemberSerializer(member, data=request.data)
+    def list(self, request, cpf):
+        seila = get_object_or_404(Register, pk=cpf)
+        serializer = self.serializer_class(seila)
+        return Response(serializer.data)
+
+    def put(self, request, cpf):
+        seila = get_object_or_404(Register, pk=cpf)
+        serializer = self.serializer_class(seila, data=request.data)
         if serializer.is_valid():
             with transaction.atomic():
                 serializer.save()
