@@ -1,37 +1,47 @@
-import datetime
-
+from datetime import date
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import generics, status
-
 from member.models import Member
 from .models import Recommend
 from .serializers import RecommendSerializer
 
 
-# Create your views here.
-
-class Generatecoupon(generics.ListCreateAPIView):
-    queryset = Recommend.objects.all()
+class Generatecoupon(generics.CreateAPIView):
     serializer_class = RecommendSerializer
-
-    def list(self, request):
-        queryset = Recommend.objects.all()
-        serializer = self.serializer_class(queryset, many=True)
-        return Response(serializer.data)
+    queryset = RecommendSerializer
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            coupon_source = get_object_or_404(Member, pk=request.data['source'])
-            coupon_target = get_object_or_404(Member, pk=request.data['target'])
-            if coupon_target == coupon_source:
-                return Response({'Você não pode um cupom para você mesmo'})
+            try:
+                Member.objects.get(cpf=request.data['source'])
+            except ObjectDoesNotExist:
+                return Response({'O usuário de origem não existe': request.data['source']},
+                                status=status.HTTP_400_BAD_REQUEST)
+            try:
+                Member.objects.get(cpf=request.data['target'])
+            except Member.DoesNotExist:
+                pass
+
+            if request.data['source'] == request.data['target']:
+                return Response({'você não pode enviar um cupom pra você mesmo'}, status=status.HTTP_400_BAD_REQUEST)
+
+            elif Member.objects.filter(cpf=request.data['target']).exists():
+                return Response({'Esse usuário já tem cadastro'}, status=status.HTTP_400_BAD_REQUEST)
+
             else:
-                with transaction.atomic():
-                    serializer.save()
-                    return Response(serializer.data)
+                target = Recommend.objects.filter(target=request.data['target']).last()
+                if target is not None:
+                    oi = target.hoje - date.today()
+                    if oi.days <= 30:
+                        return Response({'Não podemos gerar outro cupom, essa pessoa já foi indicada'},
+                                        status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        pass
+                else:
+                    with transaction.atomic():
+                        serializer.save()
+                        return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(status.HTTP_400_BAD_REQUEST)

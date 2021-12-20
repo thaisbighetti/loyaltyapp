@@ -1,5 +1,7 @@
 from datetime import timedelta, date
 import uuid
+
+from django.contrib import admin
 from django.db import models
 from localflavor.br.models import BRCPFField
 
@@ -13,5 +15,11 @@ class Recommend(models.Model):
     source = BRCPFField()
     target = BRCPFField()
     cupom = models.UUIDField(default=uuid.uuid4)
-    today = models.DateField(default=date.today())
+    hoje = models.DateField(default=date.today())
     expires = models.DateField(default=valid_to)
+
+    def __str__(self):
+        return f'De: {self.source} | Para: {self.target}'
+
+
+
