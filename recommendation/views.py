@@ -1,6 +1,7 @@
 from datetime import date
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from rest_framework import generics, status
 from member.models import Member
@@ -45,3 +46,11 @@ class Generatecoupon(generics.CreateAPIView):
                         serializer.save()
                         return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(status.HTTP_400_BAD_REQUEST)
+
+
+class RecommendList(generics.ListAPIView):
+    model = Recommend
+    queryset = Recommend.objects.all()
+    serializer_class = RecommendSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['source', 'target']
