@@ -1,3 +1,5 @@
+from datetime import date
+
 from rest_framework import serializers
 from .models import Member, Register
 from django.core.exceptions import ObjectDoesNotExist
@@ -13,10 +15,11 @@ class MemberSerializer(serializers.ModelSerializer):
 class RegistrationSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
     password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+    coupon = serializers.CharField(max_length=100)
 
     class Meta:
         model = Register
-        fields = ['cpf', 'password', 'password2']
+        fields = ['cpf', 'password', 'password2', 'coupon']
         extra_kwargs = {'password': {'write_only': True}}
 
     def save(self):
@@ -27,6 +30,19 @@ class RegistrationSerializer(serializers.ModelSerializer):
         except ObjectDoesNotExist:
             register.cpf = cpf
             register.save()
+
+        validate_coupon = Recommend.objects.get(coupon=self.validated_data['coupon'])
+        if validate_coupon.cpf == self.validated_data['cpf']:
+            if validate_coupon is not None:
+                oi = validate_coupon.hoje - date.today()
+                if oi.days <= 30:
+                    pass
+                else:
+                    raise serializers.ValidationError({'Cupom Expirado'})
+            else:
+                raise serializers.ValidationError({'Cupom não encontrado'})
+        else:
+            raise serializers.ValidationError({'Cpf nao encontrado'})
 
         password = self.validated_data['password']
         password2 = self.validated_data['password2']

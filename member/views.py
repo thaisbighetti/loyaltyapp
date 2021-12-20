@@ -3,6 +3,7 @@ import http
 from django.db import transaction
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from rest_framework import generics, status
 from member.models import Member, Register
@@ -24,7 +25,7 @@ class RegisterMember(generics.CreateAPIView):
         return Response({'CPF já existe'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class MemberList(generics.ListAPIView):
+class MemberView(generics.UpdateAPIView):
     serializer_class = MemberSerializer
     queryset = MemberSerializer
 
@@ -47,6 +48,14 @@ class MemberList(generics.ListAPIView):
         register.delete()
         member.delete()
         return Response(status=http.HTTPStatus.NO_CONTENT)
+
+
+class MemberList(generics.ListAPIView):
+    model = Member
+    queryset = Member.objects.all()
+    serializer_class = MemberSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['cpf']
 
 
 class PasswordChange(generics.ListAPIView):
