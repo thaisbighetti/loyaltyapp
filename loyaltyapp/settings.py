@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'recommendation',
-    'search',
+    'django_filters',
     'member',
     'localflavor',
     'phonenumber_field',
