@@ -40,7 +40,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
                     oi = validate_coupon.created - date.today()
                     if oi.days <= 30:
                         pass
-                        logger.error(f'{timezone.now()} | Coupon is valid')
+                        logger.error(f'{timezone.now()} | Coupon is valid |')
                         source = Member.objects.get(cpf=validate_coupon.source)
                         source.points += 500
                         source.save()
@@ -48,10 +48,10 @@ class RegistrationSerializer(serializers.ModelSerializer):
                         logger.error(f'{timezone.now()} |Something went wrong | Coupon is expired')
                         raise serializers.ValidationError({'Cupom Expirado'})
             else:
-                logger.info(f'{timezone.now()} | 400 |Something went wrong | CPF not found')
-                raise serializers.ValidationError('Cpf nao encontrado')
+                logger.info(f'{timezone.now()} | 400 |Something went wrong | CPF not found |')
+                raise serializers.ValidationError('CPF não encontrado')
         except ObjectDoesNotExist:
-            logger.error(f'{timezone.now()} | 400 |Something went wrong | Coupon not found')
+            logger.error(f'{timezone.now()} | 400 |Something went wrong | Coupon not found |')
             raise serializers.ValidationError({'Cupom não encontrado'})
 
 

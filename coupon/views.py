@@ -1,6 +1,7 @@
-from datetime import date
+import logging
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
+from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
@@ -8,6 +9,9 @@ from rest_framework import generics, status
 from member.models import Member
 from .models import Coupon
 from .serializers import CouponSerializer
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 class Generatecoupon(generics.CreateAPIView):
@@ -20,6 +24,7 @@ class Generatecoupon(generics.CreateAPIView):
             try:
                 Member.objects.get(cpf=request.data['source'])
             except ObjectDoesNotExist:
+                logger.error(f'{timezone.now()} | 400 | Source does not exist |')
                 return Response({'O usuário de origem não existe': request.data['source']},
                                 status=status.HTTP_400_BAD_REQUEST)
             try:
@@ -27,22 +32,18 @@ class Generatecoupon(generics.CreateAPIView):
             except Member.DoesNotExist:
                 pass
             if request.data['source'] == request.data['target']:
+                logger.error(f'{timezone.now()} | 400 | Source and target are equal |')
                 return Response({'você não pode enviar um cupom pra você mesmo'}, status=status.HTTP_400_BAD_REQUEST)
 
             elif Member.objects.filter(cpf=request.data['target']).exists():
+                logger.error(f'{timezone.now()} | 400 | Target already exists |')
                 return Response({'Esse usuário já tem cadastro'}, status=status.HTTP_400_BAD_REQUEST)
-
             else:
-                target = Coupon.objects.filter(target=request.data['target']).last()
-                if target is not None:
-                    oi = target.created - date.today()
-                    if oi.days <= 30:
-                        return Response({'Não podemos gerar outro cupom, essa pessoa já foi indicada'},
-                                        status=status.HTTP_400_BAD_REQUEST)
-                else:
-                    with transaction.atomic():
-                        serializer.save()
-                    return Response(serializer.data,status=status.HTTP_200_OK)
+                with transaction.atomic():
+                    logger.info(f'{timezone.now()} | Saving |')
+                    serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        logger.error(f'{timezone.now()}| 400 | Serializer is not valid |')
         return Response(status.HTTP_400_BAD_REQUEST)
 
 

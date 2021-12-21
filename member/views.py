@@ -37,7 +37,7 @@ class RegisterMember(generics.CreateAPIView):
                 member.save()
                 logger.info(f'{timezone.now()}| 201 | Success, saving and redirecting to member page |')
                 return HttpResponseRedirect(redirect_to=f'http://127.0.0.1:8000/member/{request.data["cpf"]}')
-        logger.info(f'{timezone.now()} | 400 |Something went wrong | CPF already exists |')
+        logger.error(f'{timezone.now()} | 400 |Something went wrong | CPF already exists |')
         return Response({'CPF já existe'}, status=status.HTTP_400_BAD_REQUEST)
 
 
