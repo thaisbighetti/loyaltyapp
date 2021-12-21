@@ -15,13 +15,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from member.views import MemberList,  RegisterMember, PasswordChange, MemberView
+from member.views import MemberList,  RegisterMember, MemberView, MainPage
+from coupon.views import Generatecoupon, CouponList, CouponSearch
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', RegisterMember.as_view()),
+    path('', MainPage.as_view()),
+    path('register/', RegisterMember.as_view()),
     path('member/<str:cpf>', MemberView.as_view()),
+    path('coupon/', Generatecoupon.as_view()),
+    path('<str:cpf1>/coupon-to/<str:cpf2>', CouponList.as_view()),
+    path('search/coupon/', CouponSearch.as_view()),
     path('search/member/', MemberList.as_view()),
-    path('password/<str:cpf>', PasswordChange.as_view()),
 
 ]

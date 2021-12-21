@@ -1,26 +1,28 @@
+import logging
 from datetime import date
-
+from django.utils import timezone
 from rest_framework import serializers
+from coupon.models import Coupon
 from .models import Member, Register
 from django.core.exceptions import ObjectDoesNotExist
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
         fields = '__all__'
-        read_only_fields = ['cpf', 'pontos', 'creation']
+        read_only_fields = ['cpf', 'points', 'created']
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
-    password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
-    password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
-    coupon = serializers.CharField(max_length=100)
+    coupon = serializers.CharField(max_length=255)
 
     class Meta:
-        model = Register
-        fields = ['cpf', 'password', 'password2', 'coupon']
-        extra_kwargs = {'password': {'write_only': True}}
+        model = Member
+        fields = ['cpf', 'coupon']
 
     def save(self):
         register = Register()
@@ -30,65 +32,28 @@ class RegistrationSerializer(serializers.ModelSerializer):
         except ObjectDoesNotExist:
             register.cpf = cpf
             register.save()
-
-        validate_coupon = Recommend.objects.get(coupon=self.validated_data['coupon'])
-        if validate_coupon.cpf == self.validated_data['cpf']:
-            if validate_coupon is not None:
-                oi = validate_coupon.hoje - date.today()
-                if oi.days <= 30:
-                    pass
-                else:
-                    raise serializers.ValidationError({'Cupom Expirado'})
+        try:
+            validate_coupon = Coupon.objects.get(coupon=self.validated_data['coupon'])
+            logger.info(f'{timezone.now()} | Checking if coupon is valid')
+            if validate_coupon.target == self.validated_data['cpf']:
+                if validate_coupon is not None:
+                    oi = validate_coupon.created - date.today()
+                    if oi.days <= 30:
+                        pass
+                        logger.error(f'{timezone.now()} | Coupon is valid')
+                        source = Member.objects.get(cpf=validate_coupon.source)
+                        source.points += 500
+                        source.save()
+                    else:
+                        logger.error(f'{timezone.now()} |Something went wrong | Coupon is expired')
+                        raise serializers.ValidationError({'Cupom Expirado'})
             else:
-                raise serializers.ValidationError({'Cupom não encontrado'})
-        else:
-            raise serializers.ValidationError({'Cpf nao encontrado'})
-
-        password = self.validated_data['password']
-        password2 = self.validated_data['password2']
-
-        if password != password2:
-            raise serializers.ValidationError("passwords must match")
-        else:
-            register.password = password
-            if password.isnumeric():
-                raise serializers.ValidationError("senha tem que ter:, letras e pelo menos 6 dígitos")
-
-            if password.isalpha():
-                raise serializers.ValidationError("senha tem que ter: números, e pelo menos 6 dígitos")
-
-            if len(password) <= 5:
-                raise serializers.ValidationError("senha tem que ter: números, letras e ")
-            else:
-                register.save()
+                logger.info(f'{timezone.now()} | 400 |Something went wrong | CPF not found')
+                raise serializers.ValidationError('Cpf nao encontrado')
+        except ObjectDoesNotExist:
+            logger.error(f'{timezone.now()} | 400 |Something went wrong | Coupon not found')
+            raise serializers.ValidationError({'Cupom não encontrado'})
 
 
-class PasswordChange(serializers.ModelSerializer):
-    new_password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
-    new_password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
 
-    class Meta:
-        model = Register
-        fields = ['cpf', 'new_password2', 'new_password']
-        extra_kwargs = {'password': {'write_only': True}}
 
-    def save(self):
-        cpf = Register.objects.get(cpf=self.validated_data['cpf'])
-
-        new_password = self.validated_data['new_password']
-        new_password2 = self.validated_data['new_password2']
-
-        if new_password != new_password2:
-            raise serializers.ValidationError("passwords must match")
-        else:
-            cpf.password = new_password
-            if new_password.isnumeric():
-                raise serializers.ValidationError("senha tem que ter:, letras e pelo menos 6 dígitos")
-
-            if new_password.isalpha():
-                raise serializers.ValidationError("senha tem que ter: números, e pelo menos 6 dígitos")
-
-            if len(new_password) <= 5:
-                raise serializers.ValidationError("senha tem que ter: números, letras e ")
-            else:
-                cpf.save()
