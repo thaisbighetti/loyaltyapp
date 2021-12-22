@@ -1,12 +1,10 @@
 import logging
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from rest_framework import generics, status
-from member.models import Member
 from .models import Coupon
 from .serializers import CouponSerializer
 
@@ -20,29 +18,17 @@ class Generatecoupon(generics.CreateAPIView):
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
+        logger.info(f'{timezone.now()} | Checking if serializer is valid | ')
         if serializer.is_valid():
-            try:
-                Member.objects.get(cpf=request.data['source'])
-            except ObjectDoesNotExist:
-                logger.error(f'{timezone.now()} | 400 | Source does not exist |')
-                return Response({'O usuário de origem não existe': request.data['source']},
-                                status=status.HTTP_400_BAD_REQUEST)
-            try:
-                Member.objects.get(cpf=request.data['target'])
-            except Member.DoesNotExist:
-                pass
-            if request.data['source'] == request.data['target']:
-                logger.error(f'{timezone.now()} | 400 | Source and target are equal |')
-                return Response({'você não pode enviar um cupom pra você mesmo'}, status=status.HTTP_400_BAD_REQUEST)
-
-            elif Member.objects.filter(cpf=request.data['target']).exists():
-                logger.error(f'{timezone.now()} | 400 | Target already exists |')
-                return Response({'Esse usuário já tem cadastro'}, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                with transaction.atomic():
-                    logger.info(f'{timezone.now()} | Saving |')
-                    serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
+            with transaction.atomic():
+                serializer.save()
+                coupon = Coupon.objects.create(source=request.data['source'], target=request.data['target'])
+                logger.info(f'{timezone.now()} | Request data is valid |')
+                logger.info(f'{timezone.now()} | Saving coupon ')
+                coupon.save()
+                logger.info(f'{timezone.now()} | 200 | Coupon saved ')
+                return Response(f'Cupom de {coupon.source} para {coupon.target} gerado com sucesso!: {coupon.coupon}  '
+                                f' |  válido de {coupon.created} até {coupon.expires}|', status=status.HTTP_200_OK)
         logger.error(f'{timezone.now()}| 400 | Serializer is not valid |')
         return Response(status.HTTP_400_BAD_REQUEST)
 
