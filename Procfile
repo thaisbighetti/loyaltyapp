@@ -1,1 +1,1 @@
-web: gunicorn desafioJS+.wsgi
+web: gunicorn thaisbighetti-loyaltyapp.wsgi
