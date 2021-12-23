@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'member',
     'localflavor',
     'phonenumber_field',
+
 ]
 
 PHONENUMBER_DB_FORMAT = "NATIONAL"
