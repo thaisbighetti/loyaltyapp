@@ -15,10 +15,10 @@ logging.basicConfig(level=logging.INFO)
 
 class MainPage(generics.ListAPIView):
     def list(self, request):
-        urls = {'Tem um cupom e quer fazer seu cadastro? Clique nesse link ->': 'https://thaisbighetti-loyaltyapp.herokuapp.com/register/',
-                'Já é cadastrado e quer indicar alguem? Clique nesse link ->': 'https://thaisbighetti-loyaltyapp.herokuapp.com/coupon/',
-                'Pesquisar um membro': 'https://thaisbighetti-loyaltyapp.herokuapp.com/search/member/',
-                'Pesquisar um cupom': 'https://thaisbighetti-loyaltyapp.herokuapp.com/search/coupon/',
+        urls = {'Tem um cupom e quer fazer seu cadastro? ->': 'http://localhost:8000/register/',
+                'Já é cadastrado e quer indicar alguem? ->': 'http://localhost:8000/coupon/',
+                'Pesquisar um membro': 'http://localhost:8000/search/member/',
+                'Pesquisar um cupom': 'http://localhost:8000/search/coupon/',
                 }
         return Response(urls)
 

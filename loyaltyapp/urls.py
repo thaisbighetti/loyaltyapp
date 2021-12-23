@@ -18,6 +18,7 @@ from django.urls import path
 from member.views import MemberList,  RegisterMember, MemberView, MainPage
 from coupon.views import Generatecoupon, CouponList, CouponSearch
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', MainPage.as_view()),
@@ -29,3 +30,4 @@ urlpatterns = [
     path('search/member/', MemberList.as_view()),
 
 ]
+
