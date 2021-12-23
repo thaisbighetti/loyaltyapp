@@ -34,8 +34,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
         validate_coupon = Recommend.objects.get(coupon=self.validated_data['coupon'])
         if validate_coupon.cpf == self.validated_data['cpf']:
             if validate_coupon is not None:
-                oi = validate_coupon.hoje - date.today()
-                if oi.days <= 30:
+                validate = validate_coupon.hoje - date.today()
+                if validate.days <= 30:
                     pass
                 else:
                     raise serializers.ValidationError({'Cupom Expirado'})
