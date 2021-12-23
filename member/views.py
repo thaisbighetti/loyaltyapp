@@ -63,13 +63,13 @@ class PasswordChange(generics.ListAPIView):
     queryset = PasswordChange
 
     def list(self, request, cpf):
-        seila = get_object_or_404(Register, pk=cpf)
-        serializer = self.serializer_class(seila)
+        get_member = get_object_or_404(Register, pk=cpf)
+        serializer = self.serializer_class(get_member)
         return Response(serializer.data)
 
     def put(self, request, cpf):
-        seila = get_object_or_404(Register, pk=cpf)
-        serializer = self.serializer_class(seila, data=request.data)
+        get_member = get_object_or_404(Register, pk=cpf)
+        serializer = self.serializer_class(get_member, data=request.data)
         if serializer.is_valid():
             with transaction.atomic():
                 serializer.save()
