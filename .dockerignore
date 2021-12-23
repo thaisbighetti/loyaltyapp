@@ -1,5 +1,3 @@
 .idea/
 **/__pycache__/
 .venv/
-Procfile
-runtime.txt

@@ -15,7 +15,7 @@ This project uses [docker](https://www.docker.com/) and [docker-compose](https:/
 
 Run:
 ``` 
-docker-compose up --build app
+docker-compose up --build 
 ``` 
 
 Will be available [here](http://localhost:8000).
