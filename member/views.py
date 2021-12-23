@@ -15,10 +15,10 @@ logging.basicConfig(level=logging.INFO)
 
 class MainPage(generics.ListAPIView):
     def list(self, request):
-        urls = {'Tem um cupom e quer fazer seu cadastro? Clique nesse link ->': 'http://127.0.0.1:8000/register/',
-                'Já é cadastrado e quer indicar alguem? Clique nesse link ->': 'http://127.0.0.1:8000/coupon/',
-                'Pesquisar um membro': 'http://127.0.0.1:8000/search/member/',
-                'Pesquisar um cupom': 'http://127.0.0.1:8000/search/coupon/',
+        urls = {'Tem um cupom e quer fazer seu cadastro? Clique nesse link ->': 'https://thaisbighetti-loyaltyapp.herokuapp.com/register/',
+                'Já é cadastrado e quer indicar alguem? Clique nesse link ->': 'https://thaisbighetti-loyaltyapp.herokuapp.com/coupon/',
+                'Pesquisar um membro': 'https://thaisbighetti-loyaltyapp.herokuapp.com/search/member/',
+                'Pesquisar um cupom': 'https://thaisbighetti-loyaltyapp.herokuapp.com/search/coupon/',
                 }
         return Response(urls)
 
@@ -37,7 +37,7 @@ class RegisterMember(generics.CreateAPIView):
                 member = Member.objects.create(cpf=request.data['cpf'], )
                 member.save()
                 logger.info(f'{timezone.now()}| 200 | Success, saving and redirecting to member page |')
-                return HttpResponseRedirect(redirect_to=f'http://127.0.0.1:8000/member/{request.data["cpf"]}')
+                return HttpResponseRedirect(redirect_to=f'/member/{request.data["cpf"]}')
         logger.error(f'{timezone.now()} | 400 |Something went wrong | CPF already exists |')
         return Response({'CPF já existe'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -59,14 +59,14 @@ class MemberView(generics.RetrieveUpdateDestroyAPIView):
             with transaction.atomic():
                 serializer.save()
                 logger.info(f'{timezone.now()}| 200 | Changes made sucessfully |')
-                return HttpResponseRedirect(redirect_to=f'http://127.0.0.1:8000/member/{cpf}',)
+                return HttpResponseRedirect(redirect_to=f'/member/{cpf}',)
         return Response({'Usuário não pode ser atualizado:': 'Nome e Telefone são campos obrigatórios'}, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, cpf):
         get_member = get_object_or_404(Member, pk=cpf)
         get_member.delete()
         logger.info(f'{timezone.now()}| 200 | Deleted member sucessfully |')
-        return HttpResponseRedirect(redirect_to=f'http://127.0.0.1:8000/')
+        return HttpResponseRedirect(redirect_to=f'/')
 
 
 class MemberList(generics.ListAPIView):
