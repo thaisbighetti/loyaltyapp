@@ -1,1 +1,1 @@
-web: gunicorn thaisbighetti-loyaltyapp.wsgi
+web: gunicorn desafiojs+.wsgi:application  --log-file -
