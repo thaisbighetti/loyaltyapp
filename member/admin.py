@@ -3,9 +3,8 @@ from .models import Member
 
 
 class MemberAdmin(admin.ModelAdmin):
-    search_fields = ['cpf', 'name', ]
-    list_display = ('cpf', 'name',)
+    search_fields = ['cpf', 'name', 'created', 'email', 'phone', 'points']
+    list_display = ('cpf', 'name', 'points', 'email', 'phone', 'created')
 
 
-# Register your models here.
 admin.site.register(Member, MemberAdmin)

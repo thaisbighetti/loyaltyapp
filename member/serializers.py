@@ -25,26 +25,24 @@ class RegistrationSerializer(serializers.ModelSerializer):
         fields = ['cpf', 'coupon']
 
     def save(self):
-        cpf = self.validated_data['cpf']
         try:
-            cpf2 = Member.objects.get(cpf=cpf)
+            Member.objects.get(cpf=self.validated_data['cpf'])
         except ObjectDoesNotExist:
             pass
 
         try:
             validate_coupon = Coupon.objects.get(coupon=self.validated_data['coupon'])
-            logger.info(f'{timezone.now()} | Checking if coupon is valid')
+            logger.info(f'{timezone.now()} | 102 | Checking if coupon is valid |')
             if validate_coupon.target == self.validated_data['cpf']:
-                if validate_coupon is not None:
-                    timedelta_coupon = validate_coupon.created - date.today()
-                    if timedelta_coupon.days >= -30:
-                        logger.info(f'{timezone.now()} | Coupon is valid |{timedelta_coupon} | {validate_coupon}')
-                        source = Member.objects.get(cpf=validate_coupon.source)
-                        source.points += 500
-                        source.save()
-                    else:
-                        logger.error(f'{timezone.now()} |Something went wrong | Coupon is expired |{timedelta_coupon}')
-                        raise serializers.ValidationError({'Cupom Expirado'})
+                timedelta_coupon = validate_coupon.created - date.today()
+                if timedelta_coupon.days >= -30:
+                    logger.info(f'{timezone.now()} | 102 | Coupon is valid |')
+                    source = Member.objects.get(cpf=validate_coupon.source)
+                    source.points += 500
+                    source.save()
+                else:
+                    logger.error(f'{timezone.now()}| 400 |Something went wrong | Coupon is expired |{timedelta_coupon}')
+                    raise serializers.ValidationError({'Cupom Expirado'})
             else:
                 logger.info(f'{timezone.now()} | 400 |Something went wrong | CPF not found |')
                 raise serializers.ValidationError('CPF não encontrado')

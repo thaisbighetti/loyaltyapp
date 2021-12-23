@@ -3,6 +3,7 @@ from django.db import transaction
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import generics, status
 from .models import Coupon
@@ -17,16 +18,17 @@ class Generatecoupon(generics.CreateAPIView):
     queryset = CouponSerializer
 
     def create(self, request):
+        logger.info(f'{timezone.now()} | Request: POST | Coupon |')
         serializer = self.serializer_class(data=request.data)
-        logger.info(f'{timezone.now()} | Checking if serializer is valid | ')
+        logger.info(f'{timezone.now()} | 102 | Checking if request data is valid | ')
         if serializer.is_valid():
             with transaction.atomic():
                 serializer.save()
                 coupon = Coupon.objects.create(source=request.data['source'], target=request.data['target'])
-                logger.info(f'{timezone.now()} | Request data is valid |')
-                logger.info(f'{timezone.now()} | Saving coupon ')
+                logger.info(f'{timezone.now()} | 102 | Request data is valid |')
+                logger.info(f'{timezone.now()} | 102 | Saving coupon |')
                 coupon.save()
-                logger.info(f'{timezone.now()} | 200 | Coupon saved ')
+                logger.info(f'{timezone.now()} | 200 | Coupon saved |')
                 return Response(f'Cupom de {coupon.source} para {coupon.target} gerado com sucesso!: {coupon.coupon}  '
                                 f' |  válido de {coupon.created} até {coupon.expires}|', status=status.HTTP_200_OK)
         logger.error(f'{timezone.now()}| 400 | Serializer is not valid |')
@@ -46,6 +48,6 @@ class CouponList(generics.ListAPIView):
     serializer_class = CouponSerializer
 
     def list(self, request, cpf1, cpf2):
-        source = Coupon.objects.get(source=cpf1, target=cpf2)
+        source = get_object_or_404(Coupon, source=cpf1, target=cpf2)
         serializer = CouponSerializer(source)
         return Response(serializer.data)

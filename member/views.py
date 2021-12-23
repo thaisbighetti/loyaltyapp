@@ -15,8 +15,10 @@ logging.basicConfig(level=logging.INFO)
 
 class MainPage(generics.ListAPIView):
     def list(self, request):
-        urls = {'Tem um cupom? Clique nesse link ->': 'http://127.0.0.1:8000/register/',
+        urls = {'Tem um cupom e quer fazer seu cadastro? Clique nesse link ->': 'http://127.0.0.1:8000/register/',
                 'Já é cadastrado e quer indicar alguem? Clique nesse link ->': 'http://127.0.0.1:8000/coupon/',
+                'Pesquisar um membro': 'http://127.0.0.1:8000/search/member/',
+                'Pesquisar um cupom': 'http://127.0.0.1:8000/search/coupon/',
                 }
         return Response(urls)
 
@@ -26,9 +28,9 @@ class RegisterMember(generics.CreateAPIView):
     queryset = RegistrationSerializer
 
     def create(self, request):
-        logger.info(f'{timezone.now()} | Request: POST |{request.data}')
+        logger.info(f'{timezone.now()} | Request: POST | Member |')
         serializer = self.serializer_class(data=request.data)
-        logger.info(f'{timezone.now()} | Checking if request data is valid |')
+        logger.info(f'{timezone.now()} | 102 | Checking if request data is valid |')
         if serializer.is_valid():
             with transaction.atomic():
                 serializer.save()
@@ -52,7 +54,7 @@ class MemberView(generics.RetrieveUpdateDestroyAPIView):
     def put(self, request, cpf):
         get_member = get_object_or_404(Member, pk=cpf)
         serializer = MemberSerializer(get_member,data=request.data, partial=True)
-        logger.info(f'{timezone.now()} | Checking if request data is valid | ')
+        logger.info(f'{timezone.now()} | 102 | Checking if request data is valid | ')
         if serializer.is_valid():
             with transaction.atomic():
                 serializer.save()

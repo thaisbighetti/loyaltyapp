@@ -24,7 +24,7 @@ class CouponSerializer(serializers.ModelSerializer):
             try:
                 Member.objects.get(cpf=self.validated_data['target'])
                 logger.error(f'{timezone.now()} | 400 | Target already exists |')
-                raise serializers.ValidationError('Esse usuário já tem cadastro')
+                raise serializers.ValidationError(f"Esse usuário já tem cadastro: {self.validated_data['target']}")
             except Member.DoesNotExist:
                 if Coupon.objects.filter(target=self.validated_data['target']).exists():
                     validate_target = Coupon.objects.filter(target=self.validated_data['target']).last()
@@ -32,4 +32,5 @@ class CouponSerializer(serializers.ModelSerializer):
                     if timedelta_coupon.days < -30:
                         pass
                     else:
+                        logger.error(f'{timezone.now()} | 400 | Coupon for CPF already exists |')
                         raise serializers.ValidationError('Já foi gerado um cupom pra esse cpf nos últimos 30 dias')

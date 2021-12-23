@@ -7,7 +7,6 @@ from django.test import TestCase
 from coupon.models import Coupon
 from member.models import Member
 
-
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -22,8 +21,12 @@ class APIEndpointsTest(TestCase):
         response = self.client.get(URI)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {'Tem um cupom? Clique nesse link ->': 'http://127.0.0.1:8000/register/',
-                                           'Já é cadastrado e quer indicar alguem? Clique nesse link ->': 'http://127.0.0.1:8000/coupon/'})
+        self.assertEqual(response.json(), {
+            'Tem um cupom e quer fazer seu cadastro? Clique nesse link ->': 'http://127.0.0.1:8000/register/',
+            'Já é cadastrado e quer indicar alguem? Clique nesse link ->': 'http://127.0.0.1:8000/coupon/',
+            'Pesquisar um membro': 'http://127.0.0.1:8000/search/member/',
+            'Pesquisar um cupom': 'http://127.0.0.1:8000/search/coupon/',
+            })
 
     def test_create_coupon_should_return_200(self):
         member = Member.objects.create(cpf='72488335096')
