@@ -3,17 +3,17 @@ from datetime import date, timedelta
 from unittest.mock import ANY
 from rest_framework.test import RequestsClient
 import uuid
-from django.test import TestCase
+from django.test import TransactionTestCase
 from coupon.models import Coupon
 from member.models import Member
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-URI = 'http://127.0.0.1:8000'
+URI = 'http://localhost:8000'
 
 
-class APIEndpointsTest(TestCase):
+class APIEndpointsTest(TransactionTestCase):
     def setUp(self):
         self.client = RequestsClient()
 
@@ -21,11 +21,12 @@ class APIEndpointsTest(TestCase):
         response = self.client.get(URI)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {'Tem um cupom e quer fazer seu cadastro? ->': '/register/',
-                                           'Já é cadastrado e quer indicar alguem? ->': '/coupon/',
-                                           'Pesquisar um membro': '/search/member/',
-                                           'Pesquisar um cupom': '/search/coupon/',
-                                           })
+        self.assertEqual(response.json(),
+                         {'Tem um cupom e quer fazer seu cadastro? ->': 'http://localhost:8000/register/',
+                          'Já é cadastrado e quer indicar alguem? ->': 'http://localhost:8000/coupon/',
+                          'Pesquisar um membro': 'http://localhost:8000/search/member/',
+                          'Pesquisar um cupom': 'http://localhost:8000/search/coupon/',
+                          })
 
     def test_create_coupon_should_return_200(self):
         member = Member.objects.create(cpf='72488335096')

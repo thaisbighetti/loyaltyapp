@@ -15,9 +15,13 @@ This project uses [docker](https://www.docker.com/) and [docker-compose](https:/
 
 Run:
 ``` 
-docker-compose up --build 
+docker-compose up --build loyaltyapp
 ``` 
+To tests:
 
+``` 
+docker-compose up --build tests
+``` 
 Will be available [here](http://localhost:8000).
 
 ## Endpoints

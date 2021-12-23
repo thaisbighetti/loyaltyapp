@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
 
 ]
-INSTALLED_APPS += ["django_createsuperuser"]
+
 
 PHONENUMBER_DB_FORMAT = "NATIONAL"
 PHONENUMBER_DEFAULT_REGION = "BR"
