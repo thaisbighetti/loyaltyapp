@@ -97,3 +97,14 @@ class APIEndpointsTest(TransactionTestCase):
         response2 = self.client.get(f'{URI}/{member.cpf}/coupon-to/{coupon["target"]}')
 
         self.assertEqual(response.status_code, 200)
+
+    def test_get_member_does_not_exist_should_return_404(self):
+        response = self.client.get(f'{URI}/member/98739184005/')
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_create_member_without_coupon_should_return_400(self):
+        member = {'cpf': '98739184005'}
+
+        response = self.client.post(f'{URI}/register/', member)
+        self.assertEqual(response.status_code, 400)

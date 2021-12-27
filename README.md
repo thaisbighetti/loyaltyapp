@@ -1,4 +1,4 @@
-# loyaltyapp
+# loyaltyapp  
 
 Loyalty app where a member can invite a new member by generating a coupon.
 
@@ -13,16 +13,18 @@ Some rules must be followed:
 
 This project uses [docker](https://www.docker.com/) and [docker-compose](https://docs.docker.com/compose/).
 
-Run:
+Run app:
 ``` 
 docker-compose up --build loyaltyapp
 ``` 
-To tests:
+Will be available [here](http://localhost:8000).
+
+Run tests:
 
 ``` 
 docker-compose up --build tests
 ``` 
-Will be available [here](http://localhost:8000).
+
 
 ## Endpoints
 
@@ -35,4 +37,5 @@ Will be available [here](http://localhost:8000).
 
 ## More about the project
 
-Available on [Heroku](https://www.heroku.com/home), you can acess [here](https://thaisbighetti-loyaltyapp.herokuapp.com).
+- Available on [Heroku](https://www.heroku.com/home), you can acess [here](https://thaisbighetti-loyaltyapp.herokuapp.com).
+- [Kanban](https://trello.com/b/JBEkRoMD/desafio-juntos-somos-mais)

@@ -10,12 +10,28 @@ logging.basicConfig(level=logging.INFO)
 
 
 class CouponSerializer(serializers.ModelSerializer):
+    """
+
+    Serializer for Coupon
+
+    """
     class Meta:
         model = Coupon
         fields = '__all__'
         read_only_fields = ['coupon', 'expires', 'created']
 
     def save(self):
+        """
+        Check if source cpf is a Member and raise a validation error if not exists. Check if target cpf is a Member and
+        raise a validation error if exists.
+
+        if coupon for target exists.
+        - Check if its valid by timedelta between date was created and today,
+          if < -30, coupon is valid, if is not valid, raise a validation error.
+        - If last coupon for target is not expired, raise a validation error.
+
+        """
+
         cpf = self.validated_data['source']
         if not Member.objects.filter(cpf=cpf).exists():
             logger.error(f'{timezone.now()} | 400 | Source does not exist |')

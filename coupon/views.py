@@ -14,10 +14,21 @@ logging.basicConfig(level=logging.INFO)
 
 
 class Generatecoupon(generics.CreateAPIView):
+
+    """
+    Create a coupon.
+
+    Post as http method.
+    if serializer id valid, return a response like this:
+        - HTTP status 200.
+        - Number of 2 cpfs in request data, coupon number, date and date expires.
+    """
+
     serializer_class = CouponSerializer
     queryset = CouponSerializer
 
     def create(self, request):
+
         logger.info(f'{timezone.now()} | Request: POST | Coupon |')
         serializer = self.serializer_class(data=request.data)
         logger.info(f'{timezone.now()} | 102 | Checking if request data is valid | ')
@@ -36,6 +47,14 @@ class Generatecoupon(generics.CreateAPIView):
 
 
 class CouponSearch(generics.ListAPIView):
+
+    """
+    Get all coupons
+
+    Get as http method.
+    - Filters are available
+    """
+
     model = Coupon
     queryset = Coupon.objects.all()
     serializer_class = CouponSerializer
@@ -45,6 +64,12 @@ class CouponSearch(generics.ListAPIView):
 
 
 class CouponList(generics.ListAPIView):
+
+    """
+    Get all coupons from a member(cpf1) to a non-member(cpf2).
+    if coupon does not exist return a 404 http status.
+    """
+
     serializer_class = CouponSerializer
 
     def list(self, request, cpf1, cpf2):

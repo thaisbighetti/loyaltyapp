@@ -9,8 +9,17 @@ from django.core.exceptions import ObjectDoesNotExist
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+"""
+Made 2 serializers for Member. First serializer is a basic serializer, second is to validate the coupon"
+"""
+
 
 class MemberSerializer(serializers.ModelSerializer):
+
+    """
+    Serializer for Member.
+    """
+
     class Meta:
         model = Member
         fields = '__all__'
@@ -18,6 +27,16 @@ class MemberSerializer(serializers.ModelSerializer):
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
+
+    """
+    Serializer for Member.
+    Charfield to validate coupon because I do not want save coupon in db, just check if it exists, if not exists, raise
+    a validation error.
+    If it exists:
+    - Check if its valid by timedelta between date was created and today,
+      if < -30, coupon is valid, if is not valid, raise a validation error.
+    """
+
     coupon = serializers.CharField(max_length=255)
 
     class Meta:

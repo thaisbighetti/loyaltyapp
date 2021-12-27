@@ -14,6 +14,11 @@ logging.basicConfig(level=logging.INFO)
 
 
 class MainPage(generics.ListAPIView):
+
+    """
+    List All endpoints in the main page
+    """
+
     def list(self, request):
         urls = {'Tem um cupom e quer fazer seu cadastro? ->': 'http://localhost:8000/register/',
                 'Já é cadastrado e quer indicar alguem? ->': 'http://localhost:8000/coupon/',
@@ -24,6 +29,16 @@ class MainPage(generics.ListAPIView):
 
 
 class RegisterMember(generics.CreateAPIView):
+
+    """
+    Create a member.
+
+    Post as http method.
+    if serializer id valid, return a response like this:
+        - HTTP status 200.
+        - Redirect user to Member page.
+    """
+
     serializer_class = RegistrationSerializer
     queryset = RegistrationSerializer
 
@@ -43,6 +58,16 @@ class RegisterMember(generics.CreateAPIView):
 
 
 class MemberView(generics.RetrieveUpdateDestroyAPIView):
+
+    """
+    Get a specific Member
+
+    Get as http method.
+    If Member does not exists, return 404 http status.
+    if Member exists, UPDATE/DELETE method is available in his page.
+
+    """
+
     serializer_class = MemberSerializer
     queryset = MemberSerializer
 
@@ -60,7 +85,8 @@ class MemberView(generics.RetrieveUpdateDestroyAPIView):
                 serializer.save()
                 logger.info(f'{timezone.now()}| 200 | Changes made sucessfully |')
                 return HttpResponseRedirect(redirect_to=f'/member/{cpf}',)
-        return Response({'Usuário não pode ser atualizado:': 'Nome e Telefone são campos obrigatórios'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'Usuário não pode ser atualizado:': 'Nome e Telefone são campos obrigatórios'},
+                          status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, cpf):
         get_member = get_object_or_404(Member, pk=cpf)
@@ -70,6 +96,15 @@ class MemberView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class MemberList(generics.ListAPIView):
+
+    """
+    Get a specific Member
+
+    Get as http method.
+    - List all members
+    - Filters are available
+    """
+
     model = Member
     queryset = Member.objects.all()
     serializer_class = MemberSerializer
